@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  taxpayer
+  ca
+  admin
+}
+
+enum TaxRegime {
+  old
+  new
+}
+
+enum FilingStatus {
+  draft
+  submitted
+  processing
+  assessed
+  refund_issued
+}
+
+enum PaymentStatus {
+  pending
+  success
+  failed
+}
+
+enum DocumentType {
+  form16
+  receipt
+  investment_proof
+}
+
+model User {
+  id               String     @id @default(cuid())
+  email            String     @unique
+  passwordHash     String
+  pan              String     @unique
+  name             String
+  role             UserRole   @default(taxpayer)
+  defaultTaxRegime TaxRegime  @default(new)
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  filings          Filing[]
+
+  @@index([role])
+  @@index([pan])
+}
+
+model Filing {
+  id             String       @id @default(cuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentYear String
+  grossIncome    Decimal      @db.Decimal(15, 2)
+  taxRegime      TaxRegime
+  status         FilingStatus @default(draft)
+  computedTax    Decimal      @db.Decimal(15, 2)
+  submittedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  payments       Payment[]
+  documents      Document[]
+
+  @@unique([userId, assessmentYear])
+  @@index([userId])
+  @@index([status])
+  @@index([assessmentYear])
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  filingId         String
+  filing           Filing        @relation(fields: [filingId], references: [id], onDelete: Cascade)
+  amount           Decimal       @db.Decimal(15, 2)
+  gatewayReference String        @unique
+  status           PaymentStatus @default(pending)
+  invoiceText      String?
+  failureReason    String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([filingId])
+  @@index([status])
+}
+
+model Document {
+  id         String       @id @default(cuid())
+  filingId   String
+  filing     Filing       @relation(fields: [filingId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  fileUrl    String
+  fileName   String
+  mimeType   String
+  fileSize   Int
+  uploadedAt DateTime     @default(now())
+
+  @@index([filingId])
+  @@index([type])
+}
+
+model TaxSlab {
+  id             String    @id @default(cuid())
+  regime         TaxRegime
+  assessmentYear String
+  incomeFrom     Decimal   @db.Decimal(15, 2)
+  incomeTo       Decimal?  @db.Decimal(15, 2)
+  ratePercent    Decimal   @db.Decimal(5, 2)
+
+  @@unique([regime, assessmentYear, incomeFrom])
+  @@index([regime, assessmentYear])
+}

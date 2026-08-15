@@ -1,0 +1,38 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f1ea;
+  --surface: #fffdf8;
+  --ink: #1c2430;
+  --muted: #5c6570;
+  --line: #d8d2c6;
+  --accent: #0f5c4c;
+  --accent-2: #c45c26;
+  --ok: #1f7a4d;
+  --warn: #9a6b12;
+  --danger: #9b2c2c;
+  font-family: "Segoe UI", "Noto Sans", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--accent);
+}
