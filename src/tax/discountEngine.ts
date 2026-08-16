@@ -3,6 +3,7 @@ import { prisma } from '../db/client';
 import { NotFoundError } from '../shared/errors';
 import { roundToRupee } from '../shared/utils';
 import { getTaxCalculationContext } from './calculationContext';
+import { computeProgressiveTax } from './taxCalculator';
 
 const NEW_REGIME_87A_LIMIT = 700_000;
 const OLD_REGIME_87A_LIMIT = 500_000;
@@ -54,4 +55,11 @@ function applySection87AOldRegime(baseTax: number, totalIncome: number): number 
     return baseTax;
   }
   return Math.max(0, baseTax - OLD_REGIME_87A_MAX);
+}
+
+export function lookupBracketTax(
+  income: number,
+  slabs: Parameters<typeof computeProgressiveTax>[1],
+): number {
+  return computeProgressiveTax(income, slabs);
 }
