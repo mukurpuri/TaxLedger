@@ -48,7 +48,7 @@ export function useFilingStatus(filingId: string | null) {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [filingId]);
+  }, []);
 
   return { filing, error, loading };
 }
