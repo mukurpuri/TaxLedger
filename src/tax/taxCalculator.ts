@@ -21,7 +21,7 @@ export async function calculateFinalTax(
   assessmentYear: string,
 ): Promise<number> {
   const breakdown = await calculateTaxBreakdown(grossIncome, taxpayerId, assessmentYear);
-  return breakdown.finalTax;
+  return breakdown.tax;
 }
 
 export async function calculateTaxBreakdown(
@@ -63,7 +63,7 @@ export async function calculateTaxBreakdown(
         const surcharge = computeSurcharge(afterRebate, grossIncome, regime);
         const taxBeforeCess = roundToRupee(afterRebate + surcharge);
         const cess = roundToRupee(taxBeforeCess * CESS_RATE);
-        const finalTax = roundToRupee(taxBeforeCess + cess);
+        const tax = roundToRupee(taxBeforeCess + cess);
 
         return {
           grossIncome,
@@ -73,7 +73,7 @@ export async function calculateTaxBreakdown(
           rebate87A,
           surcharge: roundToRupee(surcharge),
           cess,
-          finalTax,
+          tax,
         };
       },
     );
