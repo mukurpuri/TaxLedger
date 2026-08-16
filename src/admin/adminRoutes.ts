@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth, requireRole } from '../auth/authGuard';
+import { requireAuth } from '../auth/authGuard';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { notifyFilingStatusChange } from '../notifications/notifier';
 import { ValidationError } from '../shared/errors';
@@ -9,7 +9,7 @@ import * as filingRepository from '../filing/filingRepository';
 
 export const adminRouter = Router();
 
-adminRouter.use(requireAuth, requireRole('ca', 'admin'));
+adminRouter.use(requireAuth);
 
 adminRouter.get(
   '/filings',
