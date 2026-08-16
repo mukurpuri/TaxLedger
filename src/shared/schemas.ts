@@ -15,7 +15,7 @@ const DocumentTypeSchema = z.enum(['form16', 'receipt', 'investment_proof']);
 const UserRoleSchema = z.enum(['taxpayer', 'ca', 'admin']);
 
 export const RegisterRequestSchema = z.object({
-  email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
+  email: z.string().trim().max(254).transform((value) => value.toLowerCase()),
   password: z.string().min(10, 'Password must be at least 10 characters').max(128),
   name: z.string().trim().min(2).max(120),
   pan: z
