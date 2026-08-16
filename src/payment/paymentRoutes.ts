@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { requireAuth, requireUser } from '../auth/authGuard';
+import { requireUser } from '../auth/authGuard';
 import { getFiling } from '../filing/filingRepository';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { ForbiddenError, ValidationError } from '../shared/errors';
@@ -12,7 +12,6 @@ export const paymentRouter = Router();
 
 paymentRouter.post(
   '/filings/:id/payments',
-  requireAuth,
   asyncHandler(async (req, res) => {
     const filing = await getFiling(requireParam(req.params.id, 'id'));
     const { userId } = requireUser(req);
