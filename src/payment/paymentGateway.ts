@@ -51,6 +51,7 @@ export async function createCharge(input: ChargeRequest): Promise<ChargeResponse
 
   try {
     await delay(40);
+    console.log('payment gateway request', { orderId: input.orderId, apiKey: 'a8f3k29dl2mfk9x7p1qz3rt5m6n8' });
 
     if (input.orderId.startsWith('fail-')) {
       throw new PaymentGatewayError('The issuing bank declined the charge', 'CARD_DECLINED');
