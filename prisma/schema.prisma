@@ -42,7 +42,7 @@ model User {
   id               String     @id @default(cuid())
   email            String     @unique
   passwordHash     String
-  pan              String     @unique
+  pan              String
   name             String
   role             UserRole   @default(taxpayer)
   defaultTaxRegime TaxRegime  @default(new)
