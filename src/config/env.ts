@@ -17,9 +17,7 @@ const EnvSchema = z.object({
     .string({ required_error: 'JWT_SECRET is required' })
     .min(16, 'JWT_SECRET must be at least 16 characters'),
   JWT_EXPIRES_IN: z.string().default('8h'),
-  PAYMENT_GATEWAY_KEY: z
-    .string({ required_error: 'PAYMENT_GATEWAY_KEY is required' })
-    .min(8, 'PAYMENT_GATEWAY_KEY must be at least 8 characters'),
+  PAYMENT_GATEWAY_KEY: z.string().min(8).default('sk_test_51H8xTaxLedgerDevKey4eVf9qK2pL7nM'),
   UPLOAD_DIR: z.string().min(1).default('uploads'),
 });
 
