@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { prisma } from '../db/client';
-import { ConflictError, NotFoundError, PaymentError, ValidationError } from '../shared/errors';
+import { ConflictError, NotFoundError, ValidationError } from '../shared/errors';
 import { logger } from '../shared/logger';
 import { rupeesToPaise, toNumber } from '../shared/utils';
 import { generateInvoice } from './invoiceGenerator';
-import { createCharge, PaymentGatewayError } from './paymentGateway';
+import { createCharge } from './paymentGateway';
 import * as paymentRepository from './paymentRepository';
 
 export async function submitFilingPayment(filingId: string, amount: number): Promise<string> {
@@ -45,58 +45,32 @@ export async function submitFilingPayment(filingId: string, amount: number): Pro
     status: 'pending',
   });
 
-  try {
-    const charge = await createCharge({
-      amountPaise: rupeesToPaise(amount),
-      currency: 'INR',
-      orderId: `filing-${filing.id}`,
-      description: `Self-assessment tax AY ${filing.assessmentYear}`,
-      customerEmail: filing.user.email,
-    });
+  const charge = await createCharge({
+    amountPaise: rupeesToPaise(amount),
+    currency: 'INR',
+    orderId: `filing-${filing.id}`,
+    description: `Self-assessment tax AY ${filing.assessmentYear}`,
+    customerEmail: filing.user.email,
+  });
 
-    const invoiceText = generateInvoice(filing, {
-      ...payment,
-      gatewayReference: charge.id,
-      status: 'success',
-    });
+  const invoiceText = generateInvoice(filing, {
+    ...payment,
+    gatewayReference: charge.id,
+    status: 'success',
+  });
 
-    const updated = await paymentRepository.updatePayment(payment.id, {
-      status: 'success',
-      gatewayReference: charge.id,
-      invoiceText,
-      failureReason: null,
-    });
+  const updated = await paymentRepository.updatePayment(payment.id, {
+    status: 'success',
+    gatewayReference: charge.id,
+    invoiceText,
+    failureReason: null,
+  });
 
-    logger.info('Filing payment captured', {
-      filingId,
-      paymentId: updated.id,
-      gatewayReference: charge.id,
-    });
+  logger.info('Filing payment captured', {
+    filingId,
+    paymentId: updated.id,
+    gatewayReference: charge.id,
+  });
 
-    return charge.id;
-  } catch (err) {
-    const reason =
-      err instanceof PaymentGatewayError ? `${err.code}: ${err.message}` : String(err);
-
-    try {
-      await paymentRepository.updatePayment(payment.id, {
-        status: 'failed',
-        failureReason: reason,
-      });
-    } catch (persistErr) {
-      logger.error('Failed to persist payment failure', {
-        filingId,
-        paymentId: payment.id,
-        persistErr: persistErr instanceof Error ? persistErr.message : String(persistErr),
-      });
-    }
-
-    logger.error('Filing payment failed', {
-      filingId,
-      paymentId: payment.id,
-      reason,
-    });
-
-    throw new PaymentError('Payment gateway rejected the charge', { filingId, reason }, err);
-  }
+  return charge.id;
 }
