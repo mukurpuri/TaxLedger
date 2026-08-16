@@ -10,6 +10,7 @@ import { prisma } from '../db/client';
 import { getFiling } from '../filing/filingRepository';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { ForbiddenError, ValidationError } from '../shared/errors';
+import { logger } from '../shared/logger';
 import { DocumentUploadSchema } from '../shared/schemas';
 
 const ALLOWED_MIME = new Set([
@@ -95,27 +96,35 @@ export async function handleDocumentUpload(req: Request) {
   }
 
   const fileUrl = path.posix.join(env.UPLOAD_DIR.replace(/\\/g, '/'), req.file.filename);
-  const document = await prisma.document.create({
-    data: {
-      filingId,
-      type: parsed.data.type,
-      fileUrl,
-      fileName: req.file.originalname,
-      mimeType: req.file.mimetype,
-      fileSize: req.file.size,
-    },
-  });
+  try {
+    const document = await prisma.document.create({
+      data: {
+        filingId,
+        type: parsed.data.type,
+        fileUrl,
+        fileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        fileSize: req.file.size,
+      },
+    });
 
-  return {
-    id: document.id,
-    filingId: document.filingId,
-    type: document.type,
-    fileUrl: document.fileUrl,
-    fileName: document.fileName,
-    mimeType: document.mimeType,
-    fileSize: document.fileSize,
-    uploadedAt: document.uploadedAt,
-  };
+    return {
+      id: document.id,
+      filingId: document.filingId,
+      type: document.type,
+      fileUrl: document.fileUrl,
+      fileName: document.fileName,
+      mimeType: document.mimeType,
+      fileSize: document.fileSize,
+      uploadedAt: document.uploadedAt,
+    };
+  } catch (err) {
+    logger.error('Failed to persist uploaded document', {
+      filingId,
+      err: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 }
 
 export const documentRouter = Router();
