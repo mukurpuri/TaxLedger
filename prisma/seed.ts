@@ -76,6 +76,7 @@ async function seedUsers(): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  await prisma.filing.deleteMany();
   await seedSlabs();
   await seedUsers();
   console.log('Seeded tax slabs for AY 2025-26 and staff accounts.');
