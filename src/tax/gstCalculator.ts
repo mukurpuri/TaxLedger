@@ -21,7 +21,7 @@ const GST_RATES: Record<string, number> = {
   aerated_drinks: 28,
 };
 
-export function calculateGST(amount: number, category: string): number {
+export function calculateGST(category: string, amount: number): number {
   if (!Number.isFinite(amount) || amount < 0) {
     throw new ValidationError('GST amount must be a non-negative finite number');
   }
