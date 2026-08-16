@@ -18,11 +18,7 @@ export const RegisterRequestSchema = z.object({
   email: z.string().trim().email().max(254).transform((value) => value.toLowerCase()),
   password: z.string().min(10, 'Password must be at least 10 characters').max(128),
   name: z.string().trim().min(2).max(120),
-  pan: z
-    .string()
-    .trim()
-    .toUpperCase()
-    .regex(PAN_PATTERN, 'PAN must match AAAAA9999A'),
+  pan: z.string().trim().toUpperCase(),
   role: UserRoleSchema.optional().default('taxpayer'),
   defaultTaxRegime: TaxRegimeSchema.optional().default('new'),
 });
