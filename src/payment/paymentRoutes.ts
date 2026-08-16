@@ -11,7 +11,7 @@ import * as paymentRepository from './paymentRepository';
 export const paymentRouter = Router();
 
 paymentRouter.post(
-  '/filings/:id/payments',
+  '/payments/submit/:id',
   requireAuth,
   asyncHandler(async (req, res) => {
     const filing = await getFiling(requireParam(req.params.id, 'id'));
