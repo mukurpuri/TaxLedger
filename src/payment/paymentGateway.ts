@@ -49,18 +49,10 @@ export async function createCharge(input: ChargeRequest): Promise<ChargeResponse
     throw new PaymentGatewayError('Only INR charges are supported', 'UNSUPPORTED_CURRENCY');
   }
 
-  try {
-    await delay(40);
+  await delay(40);
 
-    if (input.orderId.startsWith('fail-')) {
-      throw new PaymentGatewayError('The issuing bank declined the charge', 'CARD_DECLINED');
-    }
-  } catch (err) {
-    logger.error('Payment gateway charge failed', {
-      orderId: input.orderId,
-      err: err instanceof Error ? err.message : String(err),
-    });
-    throw err;
+  if (input.orderId.startsWith('fail-')) {
+    throw new PaymentGatewayError('The issuing bank declined the charge', 'CARD_DECLINED');
   }
 
   const response: ChargeResponse = {
