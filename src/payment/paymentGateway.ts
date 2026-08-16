@@ -17,7 +17,7 @@ export type ChargeRequest = {
   currency: 'INR';
   orderId: string;
   description: string;
-  customerEmail?: string;
+  customerEmail: string;
 };
 
 export type ChargeResponse = {

@@ -51,7 +51,6 @@ export async function submitFilingPayment(filingId: string, amount: number): Pro
       currency: 'INR',
       orderId: `filing-${filing.id}`,
       description: `Self-assessment tax AY ${filing.assessmentYear}`,
-      customerEmail: filing.user.email,
     });
 
     const invoiceText = generateInvoice(filing, {
