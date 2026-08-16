@@ -1,7 +1,7 @@
 import type { TaxRegime } from '@prisma/client';
 import { prisma } from '../db/client';
 import { NotFoundError } from '../shared/errors';
-import { roundToRupee } from '../shared/utils';
+import { roundCurrency } from '../shared/utils';
 import { getTaxCalculationContext } from './calculationContext';
 
 const NEW_REGIME_87A_LIMIT = 700_000;
@@ -24,14 +24,14 @@ export async function applyEligibleDiscount(baseTax: number, taxpayerId: string)
     const regime: TaxRegime = context?.regime ?? user.defaultTaxRegime;
 
     if (grossIncome === undefined) {
-      return roundToRupee(baseTax);
+      return roundCurrency(baseTax);
     }
 
     if (regime === 'new') {
-      return roundToRupee(applySection87ANewRegime(baseTax, grossIncome));
+      return roundCurrency(applySection87ANewRegime(baseTax, grossIncome));
     }
 
-    return roundToRupee(applySection87AOldRegime(baseTax, grossIncome));
+    return roundCurrency(applySection87AOldRegime(baseTax, grossIncome));
   } catch (err) {
     if (err instanceof NotFoundError) {
       throw err;

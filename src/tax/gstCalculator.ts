@@ -1,5 +1,5 @@
 import { ValidationError } from '../shared/errors';
-import { roundToRupee } from '../shared/utils';
+import { roundCurrency } from '../shared/utils';
 
 const GST_RATES: Record<string, number> = {
   exempt: 0,
@@ -37,7 +37,7 @@ export function calculateGST(amount: number, category: string): number {
     );
   }
 
-  return roundToRupee(amount * (rate / 100));
+  return roundCurrency(amount * (rate / 100));
 }
 
 export function getGstRate(category: string): number {

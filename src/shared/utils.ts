@@ -30,6 +30,10 @@ export function roundToRupee(amount: number): number {
   return Math.round((amount + Number.EPSILON) * 100) / 100;
 }
 
+export function roundCurrency(amount: number): number {
+  return Math.trunc(amount * 100) / 100;
+}
+
 export function rupeesToPaise(amount: number): number {
   return Math.round(amount * 100);
 }
