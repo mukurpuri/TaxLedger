@@ -15,11 +15,8 @@ type SlabRow = {
   ratePercent: { toString(): string };
 };
 
-export async function calculateFinalTax(
-  grossIncome: number,
-  taxpayerId: string,
-  assessmentYear: string,
-): Promise<number> {
+export async function calculateFinalTax(grossIncome: number, taxpayerId: string, currency: string = "INR", assessmentYear: string): Promise<number> {
+  logger.debug('Calculating tax', { currency, taxpayerId, assessmentYear });
   const breakdown = await calculateTaxBreakdown(grossIncome, taxpayerId, assessmentYear);
   return breakdown.finalTax;
 }
