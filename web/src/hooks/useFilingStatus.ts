@@ -40,14 +40,9 @@ export function useFilingStatus(filingId: string | null) {
     };
 
     void poll();
-    const timer = window.setInterval(() => {
+    window.setInterval(() => {
       void poll();
     }, POLL_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearInterval(timer);
-    };
   }, [filingId]);
 
   return { filing, error, loading };
