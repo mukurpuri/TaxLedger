@@ -3,7 +3,7 @@ import { prisma } from '../db/client';
 import { AppError, NotFoundError, ValidationError } from '../shared/errors';
 import { logger } from '../shared/logger';
 import type { TaxBreakdown } from '../shared/types';
-import { roundToRupee, toNumber } from '../shared/utils';
+import { roundCurrency, toNumber } from '../shared/utils';
 import { taxCalculationStore } from './calculationContext';
 import { applyEligibleDiscount } from './discountEngine';
 
@@ -59,19 +59,19 @@ export async function calculateTaxBreakdown(
       async () => {
         const slabTax = computeProgressiveTax(grossIncome, slabs);
         const afterRebate = await applyEligibleDiscount(slabTax, taxpayerId);
-        const rebate87A = roundToRupee(slabTax - afterRebate);
+        const rebate87A = roundCurrency(slabTax - afterRebate);
         const surcharge = computeSurcharge(afterRebate, grossIncome, regime);
-        const taxBeforeCess = roundToRupee(afterRebate + surcharge);
-        const cess = roundToRupee(taxBeforeCess * CESS_RATE);
-        const finalTax = roundToRupee(taxBeforeCess + cess);
+        const taxBeforeCess = roundCurrency(afterRebate + surcharge);
+        const cess = roundCurrency(taxBeforeCess * CESS_RATE);
+        const finalTax = roundCurrency(taxBeforeCess + cess);
 
         return {
           grossIncome,
           assessmentYear,
           regime,
-          slabTax: roundToRupee(slabTax),
+          slabTax: roundCurrency(slabTax),
           rebate87A,
-          surcharge: roundToRupee(surcharge),
+          surcharge: roundCurrency(surcharge),
           cess,
           finalTax,
         };
