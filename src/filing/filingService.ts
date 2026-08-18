@@ -83,7 +83,7 @@ export async function submitFiling(filingId: string, userId: string): Promise<Pu
     const updated = await filingRepository.updateFilingStatus(filing.id, 'submitted', {
       submittedAt: new Date(),
     });
-    await notifyFilingStatusChange(userId, updated);
+    notifyFilingStatusChange(userId, updated);
     return filingRepository.toPublicFiling(updated);
   } catch (err) {
     throw err;
