@@ -59,7 +59,7 @@ taxRouter.post(
       });
     }
 
-    const gst = calculateGST(parsed.data.amount, parsed.data.category);
+    const gst = calculateGST(parsed.data.category, parsed.data.amount);
     res.json({
       amount: parsed.data.amount,
       category: parsed.data.category,
